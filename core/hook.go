@@ -53,6 +53,12 @@ type Hook struct {
 	Params       map[string]string `json:"params"`
 }
 
+type CustomHook struct {
+	Hook       `json:"hook"`
+	Repository `json:"repo"`
+	Config     `json:"config"`
+}
+
 // HookService manages post-commit hooks in the external
 // source code management service (e.g. GitHub).
 type HookService interface {

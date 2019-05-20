@@ -16,6 +16,7 @@ package web
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -37,6 +38,66 @@ func init() {
 	debugPrintHook, _ = strconv.ParseBool(
 		os.Getenv("DRONE_DEBUG_DUMP_HOOK"),
 	)
+}
+
+func HandleCustomHook(
+	repos core.RepositoryStore,
+	builds core.BuildStore,
+	triggerer core.Triggerer,
+	parser core.HookParser,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if debugPrintHook {
+			// if DRONE_DEBUG_DUMP_HOOK=true print the http.Request
+			// headers and body to stdout.
+			out, _ := httputil.DumpRequest(r, true)
+			os.Stderr.Write(out)
+		}
+
+		hook := new(core.CustomHook)
+		err := json.NewDecoder(r.Body).Decode(hook)
+		if err != nil {
+			logrus.Debugf("cannot parse webhook: %s", err)
+			writeBadRequest(w, err)
+			return
+		}
+
+		log := logrus.WithFields(logrus.Fields{
+			"namespace": hook.Repository.Namespace,
+			"name":      hook.Repository.Name,
+			"event":     hook.Event,
+			"commit":    hook.After,
+		})
+
+		log.Debugln("webhook parsed")
+
+		repo, err := repos.FindName(r.Context(), hook.Namespace, hook.Name)
+		if err != nil {
+			log = log.WithError(err)
+			log.Debugln("cannot find repository")
+			writeNotFound(w, err)
+			return
+		}
+
+		if !repo.Active {
+			log.Debugln("ignore webhook, repository inactive")
+			w.WriteHeader(200)
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+		ctx = logger.WithContext(ctx, log)
+		defer cancel()
+
+		builds, err := triggerer.Trigger(ctx, repo, &hook.Hook)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+
+		writeJSON(w, builds, 200)
+
+	}
 }
 
 // HandleHook returns an http.HandlerFunc that handles webhooks

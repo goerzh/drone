@@ -99,6 +99,7 @@ func (s Server) Handler() http.Handler {
 
 	r.Route("/hook", func(r chi.Router) {
 		r.Post("/", HandleHook(s.Repos, s.Builds, s.Triggerer, s.Hooks))
+		r.Post("/custom", HandleCustomHook(s.Repos, s.Builds, s.Triggerer, s.Hooks))
 	})
 
 	r.Get("/version", HandleVersion)
