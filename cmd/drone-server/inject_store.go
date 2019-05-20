@@ -20,6 +20,7 @@ import (
 	"github.com/drone/drone/metric"
 	"github.com/drone/drone/store/batch"
 	"github.com/drone/drone/store/build"
+	configStore "github.com/drone/drone/store/config"
 	"github.com/drone/drone/store/cron"
 	"github.com/drone/drone/store/logs"
 	"github.com/drone/drone/store/perm"
@@ -50,6 +51,7 @@ var storeSet = wire.NewSet(
 	secret.New,
 	global.New,
 	step.New,
+	configStore.New,
 )
 
 // provideDatabase is a Wire provider function that provides a

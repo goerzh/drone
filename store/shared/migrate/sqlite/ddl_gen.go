@@ -120,6 +120,10 @@ var migrations = []struct {
 		name: "create-table-org-secrets",
 		stmt: createTableOrgSecrets,
 	},
+	{
+		name: "create-table-configs",
+		stmt: createTableConfigs,
+	},
 }
 
 // Migrate performs the database migration. If the migration fails
@@ -555,5 +559,19 @@ CREATE TABLE IF NOT EXISTS orgsecrets (
 ,secret_pull_request      BOOLEAN
 ,secret_pull_request_push BOOLEAN
 ,UNIQUE(secret_namespace, secret_name)
+);
+`
+
+//
+// 013_create_table_config.sql
+//
+
+var createTableConfigs = `
+CREATE TABLE IF NOT EXISTS configs (
+ config_id          INTEGER PRIMARY KEY AUTOINCREMENT
+,config_after       TEXT
+,config_kind        TEXT
+,config_data        TEXT
+,UNIQUE(config_after)
 );
 `

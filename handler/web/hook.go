@@ -44,7 +44,7 @@ func HandleCustomHook(
 	repos core.RepositoryStore,
 	builds core.BuildStore,
 	triggerer core.Triggerer,
-	parser core.HookParser,
+	configs core.ConfigStore,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if debugPrintHook {
@@ -62,11 +62,36 @@ func HandleCustomHook(
 			return
 		}
 
+		config, err := configs.FindAfter(r.Context(), hook.Config.After)
+		if err != nil {
+			logrus.Debugf("cannot find config: %s", err)
+			writeBadRequest(w, err)
+			return
+		}
+
+		if config == nil {
+			err = configs.Create(r.Context(), &hook.Config)
+			if err != nil {
+				logrus.Debugf("cannot create config: %s", err)
+				writeBadRequest(w, err)
+				return
+			}
+		} else {
+			config.Kind = hook.Config.Kind
+			config.Data = hook.Config.Data
+			err = configs.Update(r.Context(), config)
+			if err != nil {
+				logrus.Debugf("cannot update config: %s", err)
+				writeBadRequest(w, err)
+				return
+			}
+		}
+
 		log := logrus.WithFields(logrus.Fields{
 			"namespace": hook.Repository.Namespace,
 			"name":      hook.Repository.Name,
-			"event":     hook.Event,
-			"commit":    hook.After,
+			"event":     hook.Hook.Event,
+			"commit":    hook.Hook.After,
 		})
 
 		log.Debugln("webhook parsed")

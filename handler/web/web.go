@@ -46,6 +46,7 @@ func New(
 	webhook core.WebhookSender,
 	options secure.Options,
 	system *core.System,
+	configs core.ConfigStore,
 ) Server {
 	return Server{
 		Admitter:  admitter,
@@ -64,6 +65,7 @@ func New(
 		Webhook:   webhook,
 		Options:   options,
 		Host:      system.Host,
+		Configs:   configs,
 	}
 }
 
@@ -85,6 +87,7 @@ type Server struct {
 	Webhook   core.WebhookSender
 	Options   secure.Options
 	Host      string
+	Configs   core.ConfigStore
 }
 
 // Handler returns an http.Handler
@@ -99,7 +102,7 @@ func (s Server) Handler() http.Handler {
 
 	r.Route("/hook", func(r chi.Router) {
 		r.Post("/", HandleHook(s.Repos, s.Builds, s.Triggerer, s.Hooks))
-		r.Post("/custom", HandleCustomHook(s.Repos, s.Builds, s.Triggerer, s.Hooks))
+		r.Post("/custom", HandleCustomHook(s.Repos, s.Builds, s.Triggerer, s.Configs))
 	})
 
 	r.Get("/version", HandleVersion)

@@ -19,8 +19,10 @@ import "context"
 type (
 	// Config represents a pipeline config file.
 	Config struct {
-		Data string `json:"data"`
-		Kind string `json:"kind"`
+		ID    int64  `json:"id,omitempty"`
+		After string `json:"after,omitempty"`
+		Data  string `json:"data"`
+		Kind  string `json:"kind"`
 	}
 
 	// ConfigArgs represents a request for the pipeline
@@ -30,6 +32,24 @@ type (
 		Repo   *Repository `json:"repo,omitempty"`
 		Build  *Build      `json:"build,omitempty"`
 		Config *Config     `json:"config,omitempty"`
+	}
+
+	// ConfigStore defines operations for working with configs.
+	ConfigStore interface {
+		// Find returns a build from the datastore.
+		Find(context.Context, int64) (*Config, error)
+
+		// FindAfter returns a config from the configstore.
+		FindAfter(context.Context, string) (*Config, error)
+
+		// Create persists a build to the datastore.
+		Create(context.Context, *Config) error
+
+		// Update updates a build in the datastore.
+		Update(context.Context, *Config) error
+
+		// Delete deletes a build from the datastore.
+		Delete(context.Context, *Config) error
 	}
 
 	// ConfigService provides pipeline configuration from an
