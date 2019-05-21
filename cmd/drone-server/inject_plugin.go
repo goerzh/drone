@@ -50,8 +50,9 @@ func provideAdmissionPlugin(client *scm.Client, orgs core.OrganizationService, u
 // provideConfigPlugin is a Wire provider function that returns
 // a yaml configuration plugin based on the environment
 // configuration.
-func provideConfigPlugin(client *scm.Client, contents core.FileService, conf spec.Config) core.ConfigService {
+func provideConfigPlugin(client *scm.Client, contents core.FileService, conf spec.Config, configs core.ConfigStore) core.ConfigService {
 	return config.Combine(
+		config.Database(configs),
 		config.Global(
 			conf.Yaml.Endpoint,
 			conf.Yaml.Secret,
