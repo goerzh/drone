@@ -575,16 +575,17 @@ func (r *Runner) poll(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = r.Manager.Accept(ctx, p.ID, r.Machine)
+	_, err = r.Manager.Accept(ctx, p.ID, r.Machine)
 	if err == db.ErrOptimisticLock {
 		return nil
 	} else if err != nil {
-		logger.WithFields(
-			logrus.Fields{
-				"stage-id": p.ID,
-				"build-id": p.BuildID,
-				"repo-id":  p.RepoID,
-			}).Warnln("runner: cannot ack stage")
+		logger.WithError(err).
+			WithFields(
+				logrus.Fields{
+					"stage-id": p.ID,
+					"build-id": p.BuildID,
+					"repo-id":  p.RepoID,
+				}).Warnln("runner: cannot ack stage")
 		return err
 	}
 

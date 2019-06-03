@@ -20,10 +20,12 @@ import (
 	"github.com/drone/drone/cmd/drone-server/config"
 	"github.com/drone/drone/core"
 	"github.com/drone/drone/handler/api"
+	"github.com/drone/drone/handler/health"
 	"github.com/drone/drone/handler/web"
 	"github.com/drone/drone/metric"
 	"github.com/drone/drone/operator/manager"
 	"github.com/drone/drone/operator/manager/rpc"
+	"github.com/drone/drone/operator/manager/rpc2"
 	"github.com/drone/drone/server"
 	"github.com/google/wire"
 
@@ -31,27 +33,45 @@ import (
 	"github.com/unrolled/secure"
 )
 
+type (
+	healthzHandler http.Handler
+	metricsHandler http.Handler
+	rpcHandlerV1   http.Handler
+	rpcHandlerV2   http.Handler
+)
+
 // wire set for loading the server.
 var serverSet = wire.NewSet(
 	manager.New,
 	api.New,
 	web.New,
+	provideHealthz,
 	provideMetric,
 	provideRouter,
 	provideRPC,
+	provideRPC2,
 	provideServer,
 	provideServerOptions,
 )
 
 // provideRouter is a Wire provider function that returns a
 // router that is serves the provided handlers.
-func provideRouter(api api.Server, web web.Server, rpc http.Handler, metrics *metric.Server) *chi.Mux {
+func provideRouter(api api.Server, web web.Server, rpcv1 rpcHandlerV1, rpcv2 rpcHandlerV2, healthz healthzHandler, metrics *metric.Server) *chi.Mux {
 	r := chi.NewRouter()
+	r.Mount("/healthz", healthz)
 	r.Mount("/metrics", metrics)
 	r.Mount("/api", api.Handler())
-	r.Mount("/rpc", rpc)
+	r.Mount("/rpc/v2", rpcv2)
+	r.Mount("/rpc", rpcv1)
 	r.Mount("/", web.Handler())
 	return r
+}
+
+// provideMetric is a Wire provider function that returns the
+// healthcheck server.
+func provideHealthz() healthzHandler {
+	v := health.New()
+	return healthzHandler(v)
 }
 
 // provideMetric is a Wire provider function that returns the
@@ -62,8 +82,16 @@ func provideMetric(session core.Session, config config.Config) *metric.Server {
 
 // provideRPC is a Wire provider function that returns an rpc
 // handler that exposes the build manager to a remote agent.
-func provideRPC(m manager.BuildManager, config config.Config) http.Handler {
-	return rpc.NewServer(m, config.RPC.Secret)
+func provideRPC(m manager.BuildManager, config config.Config) rpcHandlerV1 {
+	v := rpc.NewServer(m, config.RPC.Secret)
+	return rpcHandlerV1(v)
+}
+
+// provideRPC2 is a Wire provider function that returns an rpc
+// handler that exposes the build manager to a remote agent.
+func provideRPC2(m manager.BuildManager, config config.Config) rpcHandlerV2 {
+	v := rpc2.NewServer(m, config.RPC.Secret)
+	return rpcHandlerV2(v)
 }
 
 // provideServer is a Wire provider function that returns an

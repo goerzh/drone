@@ -86,9 +86,9 @@ func (s *Client) Request(ctx context.Context, args *manager.Request) (*core.Stag
 }
 
 // Accept accepts the build stage for execution.
-func (s *Client) Accept(ctx context.Context, stage int64, machine string) error {
+func (s *Client) Accept(ctx context.Context, stage int64, machine string) (*core.Stage, error) {
 	in := &acceptRequest{Stage: stage, Machine: machine}
-	return s.send(noContext, "/rpc/v1/accept", in, nil)
+	return nil, s.send(noContext, "/rpc/v1/accept", in, nil)
 }
 
 // Netrc returns a valid netrc for execution.
@@ -261,7 +261,7 @@ func (s *Client) send(ctx context.Context, path string, in, out interface{}) err
 
 	// Check the response for a 204 no content. This indicates
 	// the response body is empty and should be discarded.
-	if res.StatusCode == 204 {
+	if res.StatusCode == 204 || out == nil {
 		return nil
 	}
 

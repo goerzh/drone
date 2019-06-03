@@ -93,9 +93,11 @@ func InitializeApplication(config3 config.Config) (application, error) {
 	middleware := provideLogin(config3)
 	options := provideServerOptions(config3)
 	webServer := web.New(admissionService, buildStore, client, hookParser, coreLicense, licenseService, middleware, repositoryStore, session, syncer, triggerer, userStore, userService, webhookSender, options, system, configStore)
-	handler := provideRPC(buildManager, config3)
+	mainRpcHandlerV1 := provideRPC(buildManager, config3)
+	mainRpcHandlerV2 := provideRPC2(buildManager, config3)
+	mainHealthzHandler := provideHealthz()
 	metricServer := provideMetric(session, config3)
-	mux := provideRouter(server, webServer, handler, metricServer)
+	mux := provideRouter(server, webServer, mainRpcHandlerV1, mainRpcHandlerV2, mainHealthzHandler, metricServer)
 	serverServer := provideServer(mux, config3)
 	mainApplication := newApplication(cronScheduler, datadog, runner, serverServer, userStore)
 	return mainApplication, nil

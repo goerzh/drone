@@ -12,19 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web
+// +build oss
+
+package rpc2
 
 import (
-	"io"
 	"net/http"
+
+	"github.com/drone/drone/operator/manager"
 )
 
-// HandleHealthz creates an http.HandlerFunc that performs system
-// healthchecks and returns 500 if the system is in an unhealthy state.
-func HandleHealthz() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "text/plain")
-		io.WriteString(w, "OK")
-	}
+// Server wraps the chi Router in a custom type for wire
+// injection purposes.
+type Server http.Handler
+
+// NewServer returns a new rpc server that enables remote
+// interaction with the build controller using the http transport.
+func NewServer(manager manager.BuildManager, secret string) Server {
+	return Server(http.NotFoundHandler())
 }
