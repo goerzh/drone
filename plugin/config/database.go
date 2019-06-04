@@ -15,5 +15,5 @@ type database struct {
 }
 
 func (d *database) Find(ctx context.Context, req *core.ConfigArgs) (*core.Config, error) {
-	return d.configs.FindAfter(ctx, req.Build.After)
+	return d.configs.FindAfterOrExist(ctx, req.Repo.ID, req.Build.After)
 }

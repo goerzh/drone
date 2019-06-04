@@ -19,10 +19,11 @@ import "context"
 type (
 	// Config represents a pipeline config file.
 	Config struct {
-		ID    int64  `json:"id,omitempty"`
-		After string `json:"after,omitempty"`
-		Data  string `json:"data"`
-		Kind  string `json:"kind"`
+		ID     int64  `json:"id,omitempty"`
+		RepoID int64  `json:"repo_id,omitempty"`
+		After  string `json:"after,omitempty"`
+		Data   string `json:"data"`
+		Kind   string `json:"kind"`
 	}
 
 	// ConfigArgs represents a request for the pipeline
@@ -39,8 +40,17 @@ type (
 		// Find returns a build from the datastore.
 		Find(context.Context, int64) (*Config, error)
 
+		// List returns a config list from the datastore.
+		List(context.Context, int64) ([]*Config, error)
+
 		// FindAfter returns a config from the configstore.
-		FindAfter(context.Context, string) (*Config, error)
+		FindAfter(context.Context, int64, string) (*Config, error)
+
+		// FindAfterOrExist returns a config from the configstore, or nil, nil if not exist
+		FindAfterOrExist(context.Context, int64, string) (*Config, error)
+
+		// UpdateOrCreate updates a build in the datastore, or create a new entry if not exist
+		UpdateOrCreate(context.Context, *Config) error
 
 		// Create persists a build to the datastore.
 		Create(context.Context, *Config) error

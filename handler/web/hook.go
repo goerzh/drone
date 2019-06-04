@@ -62,31 +62,6 @@ func HandleCustomHook(
 			return
 		}
 
-		config, err := configs.FindAfter(r.Context(), hook.Config.After)
-		if err != nil {
-			logrus.Debugf("cannot find config: %s", err)
-			writeBadRequest(w, err)
-			return
-		}
-
-		if config == nil {
-			err = configs.Create(r.Context(), &hook.Config)
-			if err != nil {
-				logrus.Debugf("cannot create config: %s", err)
-				writeBadRequest(w, err)
-				return
-			}
-		} else {
-			config.Kind = hook.Config.Kind
-			config.Data = hook.Config.Data
-			err = configs.Update(r.Context(), config)
-			if err != nil {
-				logrus.Debugf("cannot update config: %s", err)
-				writeBadRequest(w, err)
-				return
-			}
-		}
-
 		log := logrus.WithFields(logrus.Fields{
 			"namespace": hook.Repository.Namespace,
 			"name":      hook.Repository.Name,
@@ -107,6 +82,20 @@ func HandleCustomHook(
 		if !repo.Active {
 			log.Debugln("ignore webhook, repository inactive")
 			w.WriteHeader(200)
+			return
+		}
+
+		config := &core.Config{
+			RepoID: repo.ID,
+			After:  hook.Hook.After,
+			Kind:   hook.Config.Kind,
+			Data:   hook.Config.Data,
+		}
+
+		err = configs.UpdateOrCreate(r.Context(), config)
+		if err != nil {
+			logrus.Debugf("cannot update or create config: %s", err)
+			writeBadRequest(w, err)
 			return
 		}
 

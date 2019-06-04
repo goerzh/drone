@@ -52,6 +52,7 @@ func Reset(d *db.DB) {
 		tx.Exec("DELETE FROM repos")
 		tx.Exec("DELETE FROM users")
 		tx.Exec("DELETE FROM orgsecrets")
+		tx.Exec("DELETE FROM configs")
 		return nil
 	})
 }

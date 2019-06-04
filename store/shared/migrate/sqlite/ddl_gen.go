@@ -124,6 +124,14 @@ var migrations = []struct {
 		name: "create-table-configs",
 		stmt: createTableConfigs,
 	},
+	{
+		name: "create-index-configs-repo",
+		stmt: createIndexConfigsRepo,
+	},
+	{
+		name: "create-index-configs-repo-name",
+		stmt: createIndexConfigsRepoName,
+	},
 }
 
 // Migrate performs the database migration. If the migration fails
@@ -569,9 +577,19 @@ CREATE TABLE IF NOT EXISTS orgsecrets (
 var createTableConfigs = `
 CREATE TABLE IF NOT EXISTS configs (
  config_id          INTEGER PRIMARY KEY AUTOINCREMENT
+,config_repo_id     INTEGER
 ,config_after       TEXT
 ,config_kind        TEXT
 ,config_data        TEXT
-,UNIQUE(config_after)
+,UNIQUE(config_repo_id, config_after)
+,FOREIGN KEY(config_repo_id) REFERENCES repos(repo_id) ON DELETE CASCADE
 );
+`
+
+var createIndexConfigsRepo = `
+CREATE INDEX IF NOT EXISTS ix_config_repo ON configs (config_repo_id);
+`
+
+var createIndexConfigsRepoName = `
+CREATE INDEX IF NOT EXISTS ix_config_repo_name ON configs (config_repo_id, config_after);
 `
