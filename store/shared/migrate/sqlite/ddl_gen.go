@@ -129,8 +129,8 @@ var migrations = []struct {
 		stmt: createIndexConfigsRepo,
 	},
 	{
-		name: "create-index-configs-repo-name",
-		stmt: createIndexConfigsRepoName,
+		name: "create-index-configs-repo-after",
+		stmt: createIndexConfigsRepoAfter,
 	},
 }
 
@@ -590,6 +590,6 @@ var createIndexConfigsRepo = `
 CREATE INDEX IF NOT EXISTS ix_config_repo ON configs (config_repo_id);
 `
 
-var createIndexConfigsRepoName = `
-CREATE INDEX IF NOT EXISTS ix_config_repo_name ON configs (config_repo_id, config_after);
+var createIndexConfigsRepoAfter = `
+CREATE INDEX IF NOT EXISTS ix_config_repo_after ON configs (config_repo_id, config_after);
 `
