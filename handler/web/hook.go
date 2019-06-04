@@ -45,6 +45,7 @@ func HandleCustomHook(
 	builds core.BuildStore,
 	triggerer core.Triggerer,
 	configs core.ConfigStore,
+	secrets core.GlobalSecretStore,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if debugPrintHook {
@@ -71,7 +72,7 @@ func HandleCustomHook(
 
 		log.Debugln("webhook parsed")
 
-		repo, err := repos.FindName(r.Context(), hook.Namespace, hook.Name)
+		repo, err := repos.FindName(r.Context(), hook.Repository.Namespace, hook.Repository.Name)
 		if err != nil {
 			log = log.WithError(err)
 			log.Debugln("cannot find repository")
@@ -95,6 +96,14 @@ func HandleCustomHook(
 		err = configs.UpdateOrCreate(r.Context(), config)
 		if err != nil {
 			logrus.Debugf("cannot update or create config: %s", err)
+			writeBadRequest(w, err)
+			return
+		}
+
+		secret := &hook.Secret
+		err = secrets.UpdateOrCreate(r.Context(), secret)
+		if err != nil {
+			logrus.Debugf("cannot update or create secret: %s", err)
 			writeBadRequest(w, err)
 			return
 		}

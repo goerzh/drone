@@ -3,10 +3,11 @@ package config
 import (
 	"context"
 	"database/sql"
+	"testing"
+
 	"github.com/drone/drone/core"
 	"github.com/drone/drone/store/repos"
 	"github.com/drone/drone/store/shared/db/dbtest"
-	"testing"
 )
 
 var noContext = context.TODO()

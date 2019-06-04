@@ -87,6 +87,12 @@ type (
 		// FindName returns a secret from the datastore.
 		FindName(ctx context.Context, namespace, name string) (*Secret, error)
 
+		// FindNameOrNot returns a secret from the datastore, and return nil,nil if not exits
+		FindNameOrNot(ctx context.Context, namespace, name string) (*Secret, error)
+
+		// UpdateOrCreate updates a secret in the datastore, or create a new entry if not exist
+		UpdateOrCreate(context.Context, *Secret) error
+
 		// Create persists a new secret to the datastore.
 		Create(ctx context.Context, secret *Secret) error
 

@@ -92,7 +92,7 @@ func InitializeApplication(config3 config.Config) (application, error) {
 	hookParser := parser.New(client)
 	middleware := provideLogin(config3)
 	options := provideServerOptions(config3)
-	webServer := web.New(admissionService, buildStore, client, hookParser, coreLicense, licenseService, middleware, repositoryStore, session, syncer, triggerer, userStore, userService, webhookSender, options, system, configStore)
+	webServer := web.New(admissionService, buildStore, client, hookParser, coreLicense, licenseService, middleware, repositoryStore, session, syncer, triggerer, userStore, userService, webhookSender, options, system, configStore, globalSecretStore)
 	mainRpcHandlerV1 := provideRPC(buildManager, config3)
 	mainRpcHandlerV2 := provideRPC2(buildManager, config3)
 	mainHealthzHandler := provideHealthz()

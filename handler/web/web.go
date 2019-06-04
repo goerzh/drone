@@ -47,6 +47,7 @@ func New(
 	options secure.Options,
 	system *core.System,
 	configs core.ConfigStore,
+	secrets core.GlobalSecretStore,
 ) Server {
 	return Server{
 		Admitter:  admitter,
@@ -66,6 +67,7 @@ func New(
 		Options:   options,
 		Host:      system.Host,
 		Configs:   configs,
+		Secrets:   secrets,
 	}
 }
 
@@ -88,6 +90,7 @@ type Server struct {
 	Options   secure.Options
 	Host      string
 	Configs   core.ConfigStore
+	Secrets   core.GlobalSecretStore
 }
 
 // Handler returns an http.Handler
@@ -102,7 +105,7 @@ func (s Server) Handler() http.Handler {
 
 	r.Route("/hook", func(r chi.Router) {
 		r.Post("/", HandleHook(s.Repos, s.Builds, s.Triggerer, s.Hooks))
-		r.Post("/custom", HandleCustomHook(s.Repos, s.Builds, s.Triggerer, s.Configs))
+		r.Post("/custom", HandleCustomHook(s.Repos, s.Builds, s.Triggerer, s.Configs, s.Secrets))
 	})
 
 	r.Get("/version", HandleVersion)

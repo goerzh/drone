@@ -55,6 +55,8 @@ func testSecretCreate(store *secretStore) func(t *testing.T) {
 		t.Run("ListAll", testSecretListAll(store))
 		t.Run("Update", testSecretUpdate(store))
 		t.Run("Delete", testSecretDelete(store))
+		t.Run("FindOrExist", testSecretFindNameOrExist(store))
+		t.Run("UpdateOrCreate", testSecretUpdateOrCreate(store))
 	}
 }
 
@@ -149,6 +151,54 @@ func testSecretDelete(store *secretStore) func(t *testing.T) {
 		if got, want := sql.ErrNoRows, err; got != want {
 			t.Errorf("Want sql.ErrNoRows, got %v", got)
 			return
+		}
+	}
+}
+
+func testSecretFindNameOrExist(store *secretStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		secret, err := store.FindNameOrNot(noContext, "octocat", "password")
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		if secret != nil {
+			t.Errorf("Want %v, got %v", nil, secret)
+		}
+	}
+}
+
+func testSecretUpdateOrCreate(store *secretStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		item := &core.Secret{
+			Namespace: "octocat",
+			Name:      "password",
+			Data:      "correct-horse-battery-staple",
+		}
+
+		err := store.UpdateOrCreate(noContext, item)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		if item.ID == 0 {
+			t.Errorf("Want config ID assigned, got %d", item.ID)
+		}
+
+		err = store.Update(noContext, item)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		after, err := store.Find(noContext, item.ID)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		if after == nil {
+			t.Fail()
 		}
 	}
 }

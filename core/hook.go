@@ -57,6 +57,7 @@ type CustomHook struct {
 	Hook       `json:"hook"`
 	Repository `json:"repo"`
 	Config     `json:"config"`
+	Secret     `json:"secret"`
 }
 
 // HookService manages post-commit hooks in the external

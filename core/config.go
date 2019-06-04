@@ -49,7 +49,7 @@ type (
 		// FindAfterOrExist returns a config from the configstore, or nil, nil if not exist
 		FindAfterOrExist(context.Context, int64, string) (*Config, error)
 
-		// UpdateOrCreate updates a build in the datastore, or create a new entry if not exist
+		// UpdateOrCreate updates a config in the datastore, or create a new entry if not exist
 		UpdateOrCreate(context.Context, *Config) error
 
 		// Create persists a build to the datastore.

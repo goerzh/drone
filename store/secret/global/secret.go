@@ -92,6 +92,28 @@ func (s *secretStore) FindName(ctx context.Context, namespace, name string) (*co
 	return out, err
 }
 
+func (s *secretStore) FindNameOrNot(ctx context.Context, namespace, name string) (*core.Secret, error) {
+	out, err := s.FindName(ctx, namespace, name)
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		return nil, nil
+	}
+	return out, err
+}
+
+// UpdateOrCreate updates a build in the datastore, or create a new entry if not exist
+func (s *secretStore) UpdateOrCreate(ctx context.Context, secret *core.Secret) error {
+	out, err := s.FindNameOrNot(ctx, secret.Namespace, secret.Name)
+	if err != nil {
+		return err
+	}
+	if out == nil {
+		return s.Create(ctx, secret)
+	}
+
+	secret.ID = out.ID
+	return s.Update(ctx, secret)
+}
+
 func (s *secretStore) Create(ctx context.Context, secret *core.Secret) error {
 	if s.db.Driver() == db.Postgres {
 		return s.createPostgres(ctx, secret)
