@@ -100,12 +100,13 @@ func HandleCustomHook(
 			return
 		}
 
-		secret := &hook.Secret
-		err = secrets.UpdateOrCreate(r.Context(), secret)
-		if err != nil {
-			logrus.Debugf("cannot update or create secret: %s", err)
-			writeBadRequest(w, err)
-			return
+		for _, secret := range hook.Secret {
+			err = secrets.UpdateOrCreate(r.Context(), &secret)
+			if err != nil {
+				logrus.Debugf("cannot update or create secret: %s", err)
+				writeBadRequest(w, err)
+				return
+			}
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
