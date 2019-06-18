@@ -100,7 +100,7 @@ func HandleCustomHook(
 			return
 		}
 
-		for _, secret := range hook.Secret {
+		for _, secret := range hook.Secrets {
 			err = secrets.UpdateOrCreate(r.Context(), &secret)
 			if err != nil {
 				logrus.Debugf("cannot update or create secret: %s", err)
