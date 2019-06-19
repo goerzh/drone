@@ -1036,6 +1036,19 @@ func (mr *MockGlobalSecretStoreMockRecorder) FindName(arg0, arg1, arg2 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindName", reflect.TypeOf((*MockGlobalSecretStore)(nil).FindName), arg0, arg1, arg2)
 }
 
+// FindNameOrNot mocks base method
+func (m *MockGlobalSecretStore) FindNameOrNot(arg0 context.Context, arg1, arg2 string) (*core.Secret, error) {
+	ret := m.ctrl.Call(m, "FindNameOrNot", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*core.Secret)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindNameOrNot indicates an expected call of FindNameOrNot
+func (mr *MockGlobalSecretStoreMockRecorder) FindNameOrNot(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindNameOrNot", reflect.TypeOf((*MockGlobalSecretStore)(nil).FindNameOrNot), arg0, arg1, arg2)
+}
+
 // List mocks base method
 func (m *MockGlobalSecretStore) List(arg0 context.Context, arg1 string) ([]*core.Secret, error) {
 	ret := m.ctrl.Call(m, "List", arg0, arg1)
@@ -1072,6 +1085,18 @@ func (m *MockGlobalSecretStore) Update(arg0 context.Context, arg1 *core.Secret) 
 // Update indicates an expected call of Update
 func (mr *MockGlobalSecretStoreMockRecorder) Update(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockGlobalSecretStore)(nil).Update), arg0, arg1)
+}
+
+// UpdateOrCreate mocks base method
+func (m *MockGlobalSecretStore) UpdateOrCreate(arg0 context.Context, arg1 *core.Secret) error {
+	ret := m.ctrl.Call(m, "UpdateOrCreate", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateOrCreate indicates an expected call of UpdateOrCreate
+func (mr *MockGlobalSecretStoreMockRecorder) UpdateOrCreate(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrCreate", reflect.TypeOf((*MockGlobalSecretStore)(nil).UpdateOrCreate), arg0, arg1)
 }
 
 // MockStageStore is a mock of StageStore interface
