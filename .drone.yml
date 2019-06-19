@@ -36,14 +36,10 @@ steps:
 - name: publish_agent
   image: plugins/docker
   settings:
-    auto_tag: true
-    auto_tag_suffix: linux-amd64
     dockerfile: docker/Dockerfile.agent.linux.amd64
-    password:
-      from_secret: docker_password
     repo: registry.kuainiujinke.com/drone/agent
-    username:
-      from_secret: docker_username
+    password: Zxcvbnm,.1
+    username: zhangpanpan
   when:
     event:
     - push
@@ -52,14 +48,10 @@ steps:
 - name: publish_controller
   image: plugins/docker
   settings:
-    auto_tag: true
-    auto_tag_suffix: linux-amd64
     dockerfile: docker/Dockerfile.controller.linux.amd64
-    password:
-      from_secret: docker_password
     repo: registry.kuainiujinke.com/drone/controller
-    username:
-      from_secret: docker_username
+    password: Zxcvbnm,.1
+    username: zhangpanpan
   when:
     event:
     - push
@@ -68,14 +60,10 @@ steps:
 - name: publish_server
   image: plugins/docker
   settings:
-    auto_tag: true
-    auto_tag_suffix: linux-amd64
     dockerfile: docker/Dockerfile.server.linux.amd64
-    password:
-      from_secret: docker_password
     repo: registry.kuainiujinke.com/drone/drone
-    username:
-      from_secret: docker_username
+    password: Zxcvbnm,.1
+    username: zhangpanpan
   when:
     event:
     - push
