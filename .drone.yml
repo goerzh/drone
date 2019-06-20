@@ -7,16 +7,16 @@ platform:
   arch: amd64
 
 steps:
-  - name: test
-    image: golang:1.11
-    commands:
-      - go test -v ./...
-    volumes:
-      - name: gopath
-        path: /go
-    environment:
-      http_proxy: http://10.1.1.46:8888
-      https_proxy: http://10.1.1.46:8888
+- name: test
+  image: golang:1.11
+  commands:
+    - go test -v ./...
+  volumes:
+    - name: gopath
+      path: /go
+  environment:
+    http_proxy: http://10.1.1.46:8888
+    https_proxy: http://10.1.1.46:8888
 
 - name: build
   image: golang:1.11
