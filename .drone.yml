@@ -43,6 +43,7 @@ steps:
     repo: registry.kuainiujinke.com/drone/agent
     password: Zxcvbnm,.1
     username: zhangpanpan
+    registry: registry.kuainiujinke.com
   when:
     event:
     - push
@@ -55,6 +56,7 @@ steps:
     repo: registry.kuainiujinke.com/drone/controller
     password: Zxcvbnm,.1
     username: zhangpanpan
+    registry: registry.kuainiujinke.com
   when:
     event:
     - push
@@ -67,6 +69,7 @@ steps:
     repo: registry.kuainiujinke.com/drone/drone
     password: Zxcvbnm,.1
     username: zhangpanpan
+    registry: registry.kuainiujinke.com
   when:
     event:
     - push
