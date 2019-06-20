@@ -7,16 +7,16 @@ platform:
   arch: amd64
 
 steps:
-  #- name: test
-  #  image: golang:1.11
-  #  commands:
-  #  - go test -v ./...
-  #  volumes:
-  #  - name: gopath
-  #    path: /go
-  #  environment:
-  #    http_proxy: http://10.1.1.46:8888
-  #    https_proxy: http://10.1.1.46:8888
+  - name: test
+    image: golang:1.11
+    commands:
+      - go test -v ./...
+    volumes:
+      - name: gopath
+        path: /go
+    environment:
+      http_proxy: http://10.1.1.46:8888
+      https_proxy: http://10.1.1.46:8888
 
 
 - name: build
@@ -28,9 +28,6 @@ steps:
   volumes:
   - name: gopath
     path: /go
-  environment:
-    http_proxy: http://10.1.1.46:8888
-    https_proxy: http://10.1.1.46:8888
   when:
     event:
     - push
@@ -39,11 +36,15 @@ steps:
 - name: publish_agent
   image: plugins/docker
   settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
     dockerfile: docker/Dockerfile.agent.linux.amd64
     repo: registry.kuainiujinke.com/drone/agent
-    password: Zxcvbnm,.1
-    username: zhangpanpan
     registry: registry.kuainiujinke.com
+    password:
+      from_secret: docker_password
+    username:
+      from_secret: docker_username
   when:
     event:
     - push
@@ -52,11 +53,15 @@ steps:
 - name: publish_controller
   image: plugins/docker
   settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
     dockerfile: docker/Dockerfile.controller.linux.amd64
     repo: registry.kuainiujinke.com/drone/controller
-    password: Zxcvbnm,.1
-    username: zhangpanpan
     registry: registry.kuainiujinke.com
+    password:
+      from_secret: docker_password
+    username:
+      from_secret: docker_username
   when:
     event:
     - push
@@ -65,11 +70,15 @@ steps:
 - name: publish_server
   image: plugins/docker
   settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
     dockerfile: docker/Dockerfile.server.linux.amd64
     repo: registry.kuainiujinke.com/drone/drone
-    password: Zxcvbnm,.1
-    username: zhangpanpan
     registry: registry.kuainiujinke.com
+    password:
+      from_secret: docker_password
+    username:
+      from_secret: docker_username
   when:
     event:
     - push
