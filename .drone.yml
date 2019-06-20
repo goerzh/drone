@@ -18,7 +18,6 @@ steps:
       http_proxy: http://10.1.1.46:8888
       https_proxy: http://10.1.1.46:8888
 
-
 - name: build
   image: golang:1.11
   commands:
